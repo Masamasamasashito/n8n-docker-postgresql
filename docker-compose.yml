@@ -34,7 +34,7 @@ services:
 
   n8n:
     image: n8nio/n8n:latest
-    # Local default: expose 5678
+    # Local default: expose 5678 
     ports:
       - "5678:5678"
     environment:
@@ -45,6 +45,7 @@ services:
       DB_POSTGRESDB_DATABASE: ${POSTGRES_DB}
       DB_POSTGRESDB_USER: ${POSTGRES_USER}
       DB_POSTGRESDB_PASSWORD: ${POSTGRES_PASSWORD}
+     
 
       # Encryption
       N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
@@ -68,6 +69,7 @@ services:
 
       # Cookies secure in prod (set PRODUCTION=true to enable)
       N8N_SECURE_COOKIE: ${PRODUCTION:-false}
+      N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: ${PRODUCTION:-false}
     depends_on:
       postgres:
         condition: service_healthy
@@ -138,6 +140,8 @@ services:
     networks: [app]
     restart: unless-stopped
     profiles: ["prod"]
+
+
 
 networks:
   app:
