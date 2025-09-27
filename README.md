@@ -1,8 +1,9 @@
 # n8n Self-host with Postgres + Redis + Caddy — Docker Compose
 
+<div align="center">
 [![Watch the video](https://img.youtube.com/vi/_ozDuDA2BZ0/0.jpg)](https://www.youtube.com/watch?v=_ozDuDA2BZ0&t=1072s)
 **▶️ [Watch a full walkthrough on YouTube](https://www.youtube.com/watch?v=_ozDuDA2BZ0&t=1072s)**
-
+</div>
 ## Overview
 A compact Docker Compose stack to self-host **n8n** with **PostgreSQL** (persistence), **Redis** (queues), and **Caddy** (automatic HTTPS).  
 - **SearXNG** - Added SearXNG for AI search meta data.
@@ -136,6 +137,9 @@ This runs:
 ```bash
 bash backup.sh --output ./backups --include-caddy --label manual
 ```
+
+## Use searxing in an N8N
+Set url for searxing as  http://searxng:8080
 
 ## Adding a Worker (Optional, Advanced)
 For heavy loads, you can extend `docker-compose.yml` with an `n8n-worker` service.
