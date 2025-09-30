@@ -1,22 +1,20 @@
 # n8n Self-host with Postgres + Redis + Caddy — Docker Compose
 
-<p align="center">
+<p align="center" style="padding-bottom:0px;">
   <a href="https://www.youtube.com/watch?v=_ozDuDA2BZ0&t=1072s">
-    <img src="https://img.youtube.com/vi/_ozDuDA2BZ0/hqdefault.jpg" alt="Watch the video" width="80%" />
+    <img src="n8n-self-host-postgres.png" alt="Watch the video" width="80%" />
   </a>
 </p>
 
-<p align="center">
+<p align="center" style="padding: 0px,0px,0px,0px;">
   <strong>▶️ <a href="https://www.youtube.com/watch?v=_ozDuDA2BZ0&t=1072s">Watch a full walkthrough on YouTube</a></strong>
 </p>
 
 ## Overview
-A compact Docker Compose stack to self-host **n8n** with **PostgreSQL** (persistence), **Redis** (queues), and **Caddy** (automatic HTTPS).  
-- **SearXNG** - Added SearXNG for AI search meta data.
+A compact Docker Compose stack to self-host **n8n** with **PostgreSQL** (persistence), **Redis** (queues), SearXNG, and **Caddy** (automatic HTTPS).  
+
 - **Local by default**: `docker compose up -d` exposes n8n at **http://localhost:5678**.
 - **Production via profile**: add `--profile prod` and set `N8N_HOSTNAME` + `ACME_EMAIL` for HTTPS on ports 80/443.
-
-![Self Host N8N](/n8n-self-host-postgres.png?raw=true "Self Host N8N")
 
 ## Why Create This Docker Repo
 
@@ -27,6 +25,7 @@ This repo provides a **ready-to-use Docker Compose setup** that follows a consis
 - **PostgreSQL** for durable workflow and credential storage  
 - **Redis** for queueing and caching  
 - **Caddy** for automatic HTTPS, so n8n can be exposed safely on a production server (internally or on the internet)  
+- **SearXNG** for web searches in AI workflows
 
 By standardizing on this stack, we make it simple to install, secure, and share n8n environments across teams.
 
