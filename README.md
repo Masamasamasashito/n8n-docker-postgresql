@@ -1,9 +1,15 @@
 # n8n Self-host with Postgres + Redis + Caddy — Docker Compose
 
-<div align="center">
-[![Watch the video](https://img.youtube.com/vi/_ozDuDA2BZ0/0.jpg)](https://www.youtube.com/watch?v=_ozDuDA2BZ0&t=1072s)
-**▶️ [Watch a full walkthrough on YouTube](https://www.youtube.com/watch?v=_ozDuDA2BZ0&t=1072s)**
-</div>
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=_ozDuDA2BZ0&t=1072s">
+    <img src="https://img.youtube.com/vi/_ozDuDA2BZ0/maxresdefault.jpg" alt="Watch the video" width="100%" />
+  </a>
+</p>
+
+<p align="center">
+  <strong>▶️ <a href="https://www.youtube.com/watch?v=_ozDuDA2BZ0&t=1072s">Watch a full walkthrough on YouTube</a></strong>
+</p>
+
 ## Overview
 A compact Docker Compose stack to self-host **n8n** with **PostgreSQL** (persistence), **Redis** (queues), and **Caddy** (automatic HTTPS).  
 - **SearXNG** - Added SearXNG for AI search meta data.
