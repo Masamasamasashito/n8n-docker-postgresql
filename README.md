@@ -183,6 +183,10 @@ docker compose up -d n8n-worker
 docker compose up -d --scale n8n-worker=3
 ```
 
+### Using SearXNG in N8N ###
+Add SearXNG as a tool to your AI Agent
+Credentials add http://searxng:8080
+
 ### Ubuntu Commands:
 ```bash
 # Common prereqs (Ubuntu 24.04)
