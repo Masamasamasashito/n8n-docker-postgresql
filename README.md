@@ -1,14 +1,20 @@
 # n8n Self-host with Postgres + Redis + Caddy — Docker Compose
 
-[![Watch the video](https://img.youtube.com/vi/_ozDuDA2BZ0/0.jpg)](https://www.youtube.com/watch?v=_ozDuDA2BZ0&t=1072s)
-**▶️ [Watch a full walkthrough on YouTube](https://www.youtube.com/watch?v=_ozDuDA2BZ0&t=1072s)**
+<p align="center" style="padding-bottom:0px;">
+  <a href="https://www.youtube.com/watch?v=_ozDuDA2BZ0&t=1072s">
+    <img src="n8n-self-host-postgres.png" alt="Watch the video" width="80%" />
+  </a>
+</p>
+
+<p align="center" style="padding: 0px,0px,0px,0px;">
+  <strong>▶️ <a href="https://www.youtube.com/watch?v=_ozDuDA2BZ0&t=1072s">Watch a full walkthrough on YouTube</a></strong>
+</p>
 
 ## Overview
-A compact Docker Compose stack to self-host **n8n** with **PostgreSQL** (persistence), **Redis** (queues), and **Caddy** (automatic HTTPS).  
+A compact Docker Compose stack to self-host **n8n** with **PostgreSQL** (persistence), **Redis** (queues), SearXNG, and **Caddy** (automatic HTTPS).  
+
 - **Local by default**: `docker compose up -d` exposes n8n at **http://localhost:5678**.
 - **Production via profile**: add `--profile prod` and set `N8N_HOSTNAME` + `ACME_EMAIL` for HTTPS on ports 80/443.
-
-![Self Host N8N](/n8n-self-host-postgres.png?raw=true "Self Host N8N")
 
 ## Why Create This Docker Repo
 
@@ -19,6 +25,7 @@ This repo provides a **ready-to-use Docker Compose setup** that follows a consis
 - **PostgreSQL** for durable workflow and credential storage  
 - **Redis** for queueing and caching  
 - **Caddy** for automatic HTTPS, so n8n can be exposed safely on a production server (internally or on the internet)  
+- **SearXNG** for web searches in AI workflows
 
 By standardizing on this stack, we make it simple to install, secure, and share n8n environments across teams.
 
@@ -57,10 +64,11 @@ docker compose --profile prod up -d
 - Docker Compose
 - (Optional) Make
 
-## Generate N8N_ENCRYPTION_KEY
+## Generate N8N_ENCRYPTION_KEY and SEARXNG_SECRET
 **macOS/Linux**
 ```bash
 echo "N8N_ENCRYPTION_KEY=$(openssl rand -hex 32)" >> .env
+echo "SEARXNG_SECRET=$(openssl rand -hex 32)" >> .env
 ```
 **Windows PowerShell**
 ```powershell
@@ -135,6 +143,9 @@ This runs:
 bash backup.sh --output ./backups --include-caddy --label manual
 ```
 
+## Use searxing in an N8N
+Set url for searxing as  http://searxng:8080
+
 ## Adding a Worker (Optional, Advanced)
 For heavy loads, you can extend `docker-compose.yml` with an `n8n-worker` service.
 
@@ -171,6 +182,10 @@ Run workers alongside your main `n8n`:
 docker compose up -d n8n-worker
 docker compose up -d --scale n8n-worker=3
 ```
+
+### Using SearXNG in N8N ###
+Add SearXNG as a tool to your AI Agent
+Credentials add http://searxng:8080
 
 ### Ubuntu Commands:
 ```bash

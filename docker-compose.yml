@@ -34,7 +34,7 @@ services:
 
   n8n:
     image: n8nio/n8n:latest
-    # Local default: expose 5678
+    # Local default: expose 5678 
     ports:
       - "5678:5678"
     environment:
@@ -45,6 +45,7 @@ services:
       DB_POSTGRESDB_DATABASE: ${POSTGRES_DB}
       DB_POSTGRESDB_USER: ${POSTGRES_USER}
       DB_POSTGRESDB_PASSWORD: ${POSTGRES_PASSWORD}
+     
 
       # Encryption
       N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
@@ -68,6 +69,7 @@ services:
 
       # Cookies secure in prod (set PRODUCTION=true to enable)
       N8N_SECURE_COOKIE: ${PRODUCTION:-false}
+      N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: ${PRODUCTION:-false}
     depends_on:
       postgres:
         condition: service_healthy
@@ -77,6 +79,48 @@ services:
       - n8n_data:/home/node/.n8n
     networks: [app]
     restart: unless-stopped
+
+  # NEW: SearXNG
+  searxng:
+    container_name: searxng
+    image: docker.io/searxng/searxng:latest
+    restart: unless-stopped
+    # Expose to the internal network; Caddy will proxy it in prod.
+    expose:
+      - "8080"
+    # Optional: for local/dev access without Caddy, map the port behind a profile
+    ports:
+      - target: 8080
+        published: 8080
+        protocol: tcp
+        mode: host
+    volumes:
+      - ./searxng:/etc/searxng:rw
+    environment:
+      - SEARXNG_BASE_URL=https://${SEARXNG_HOSTNAME:-localhost}/
+      - UWSGI_WORKERS=${SEARXNG_UWSGI_WORKERS:-4}
+      - UWSGI_THREADS=${SEARXNG_UWSGI_THREADS:-4}
+      - SEARXNG_SECRET=${SEARXNG_SECRET}
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "1"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks: [app]
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # Only runs in production
   caddy:
@@ -96,6 +140,8 @@ services:
     networks: [app]
     restart: unless-stopped
     profiles: ["prod"]
+
+
 
 networks:
   app:
