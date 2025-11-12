@@ -1,8 +1,6 @@
-version: "3.8"
-
 services:
   postgres:
-    image: postgres:16-alpine
+    image: postgres:alpine
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-n8n}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-n8npass}
@@ -18,7 +16,7 @@ services:
     restart: unless-stopped
 
   redis:
-    image: redis:7-alpine
+    image: redis:alpine
     command: ["redis-server", "--appendonly", "yes"]
     # For production, set REDIS_PASSWORD in .env and use:
     # command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD}"]
@@ -45,7 +43,9 @@ services:
       DB_POSTGRESDB_DATABASE: ${POSTGRES_DB}
       DB_POSTGRESDB_USER: ${POSTGRES_USER}
       DB_POSTGRESDB_PASSWORD: ${POSTGRES_PASSWORD}
-     
+
+      # node_modules
+      NODE_FUNCTION_ALLOW_BUILTIN=crypto
 
       # Encryption
       N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
@@ -124,7 +124,7 @@ services:
 
   # Only runs in production
   caddy:
-    image: caddy:2-alpine
+    image: caddy:alpine
     depends_on:
       - n8n
     ports:
