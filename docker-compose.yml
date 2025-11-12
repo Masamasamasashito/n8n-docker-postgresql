@@ -59,7 +59,7 @@ services:
       # Enable community nodes as tools
       N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE: true
       # Timezone
-      GENERIC_TIMEZONE: ${GENERIC_TIMEZONE:-America/Detroit}
+      GENERIC_TIMEZONE: ${GENERIC_TIMEZONE:-Asia/Tokyo}
 
       # Redis (queue)
       QUEUE_BULL_REDIS_HOST: redis
