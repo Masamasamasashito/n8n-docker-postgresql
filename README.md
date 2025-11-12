@@ -13,7 +13,7 @@
 ## Overview
 A compact Docker Compose stack to self-host **n8n** with **PostgreSQL** (persistence), **Redis** (queues), SearXNG, and **Caddy** (automatic HTTPS).  
 
-- **Local by default**: `docker compose up -d` exposes n8n at **http://localhost:5678**.
+- **Local by default**: `docker compose up -d` exposes n8n at **http://localhost:5678**. SearXNG at **http://localhost:8080**
 - **Production via profile**: add `--profile prod` and set `N8N_HOSTNAME` + `ACME_EMAIL` for HTTPS on ports 80/443.
 
 ## Why Create This Docker Repo
