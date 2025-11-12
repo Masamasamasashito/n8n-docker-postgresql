@@ -40,7 +40,7 @@ By standardizing on this stack, we make it simple to install, secure, and share 
 
 ### Local (default)
 ```bash
-git clone https://github.com/jimiz12/n8n-docker-postgresql.git
+git clone https://github.com/Masamasamasashito/n8n-docker-postgresql.git
 cp env.example .env
 # edit .env: set POSTGRES_PASSWORD and N8N_ENCRYPTION_KEY
 docker compose up -d
@@ -49,7 +49,7 @@ open http://localhost:5678
 
 ### Production (HTTPS with Caddy)
 ```bash
-git clone https://github.com/jimiz12/n8n-docker-postgresql.git
+git clone https://github.com/Masamasamasashito/n8n-docker-postgresql.git
 cp env.example .env
 # in .env set:
 # N8N_HOSTNAME=your.domain
