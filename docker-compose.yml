@@ -45,7 +45,7 @@ services:
       DB_POSTGRESDB_PASSWORD: ${POSTGRES_PASSWORD}
 
       # node_modules
-      NODE_FUNCTION_ALLOW_BUILTIN=crypto
+      NODE_FUNCTION_ALLOW_BUILTIN: crypto
 
       # Encryption
       N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
