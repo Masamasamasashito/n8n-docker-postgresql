@@ -42,6 +42,10 @@ By standardizing on this stack, we make it simple to install, secure, and share 
 ```bash
 git clone https://github.com/Masamasamasashito/n8n-docker-postgresql.git
 cp env.example .env
+mkdir n8n_data
+mkdir postgres_data
+mkdir redis_data
+mkdir searxng
 # edit .env: set POSTGRES_PASSWORD and N8N_ENCRYPTION_KEY
 docker compose up -d
 open http://localhost:5678
