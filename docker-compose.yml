@@ -57,7 +57,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-n8npass}
       POSTGRES_DB: ${POSTGRES_DB:-n8n}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-n8n} -d ${POSTGRES_DB:-n8n}"]
       interval: 10s
@@ -145,6 +145,5 @@ networks:
   app:
 
 volumes:
-  postgres_data:
   caddy_data:
   caddy_config:
