@@ -45,7 +45,6 @@ cp env.example .env
 mkdir n8n_data
 mkdir postgres_data
 mkdir redis_data
-mkdir searxng
 # edit .env: set POSTGRES_PASSWORD and N8N_ENCRYPTION_KEY
 docker compose up -d
 open http://localhost:5678
