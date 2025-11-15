@@ -47,6 +47,8 @@ services:
         condition: service_healthy
     volumes:
       - ./n8n_data:/home/node/.n8n
+      # git for nodes. First Create ./n8n_nodes on Host
+      - ./n8n_nodes:/home/node/.n8n/nodes
     networks: [app]
     restart: unless-stopped
 
