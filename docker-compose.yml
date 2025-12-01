@@ -16,7 +16,8 @@ services:
 
       # node_modules
       NODE_FUNCTION_ALLOW_BUILTIN: crypto
-
+      # process.env
+      NODE_FUNCTION_ALLOW_EXTERNAL: process
       # Encryption
       N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
 
