@@ -35,6 +35,45 @@ By standardizing on this stack, we make it simple to install, secure, and share 
 - **IT / DevOps teams** — who need a secure, repeatable way to deploy n8n into production with SSL built-in.  
 - **Clients & partners** — who prefer a hand-off setup that “just works” without needing to piece together Postgres, Redis, and HTTPS manually.  
 
+## Additional Changes in This Fork from https://github.com/jimiz12/n8n-docker-postgresql
+
+### 1. Updated Docker image tags to `latest` / `*-alpine`
+
+This fork switches all service image tags to `latest` or `*-alpine`.
+The intention is to reduce the likelihood of running outdated images by pulling newer upstream updates (including security patches) when the containers are recreated.
+
+**Important considerations:**
+
+* Both `latest` and `*-alpine` are *rolling tags*.
+  They automatically move to newer versions as upstream releases change.
+* This improves convenience and may reduce the risk of using unpatched images, but it also **reduces reproducibility** and may introduce unexpected breaking changes.
+* For production or long-term environments, it is generally safer to **pin explicit versions**
+
+This behavior is documented to help operators choose the appropriate versioning policy based on their environment’s security and stability requirements.
+
+### 2. Added `NODE_FUNCTION_ALLOW_BUILTIN: crypto` (required for n8n Cache Warmer)
+
+This fork enables the Node.js built-in module `crypto` inside n8n Function nodes by adding:
+
+```
+NODE_FUNCTION_ALLOW_BUILTIN: crypto
+```
+
+**Why this is required:**
+
+* The current n8n-based Cache Warmer integration (designed for use with a Cloudflare Workers proxy) generates a signed authentication token.
+* This token is created using:
+
+  * **SHA-256 hashing**
+  * **Hex-encoded output**
+* Without enabling `crypto`, n8n’s Function nodes cannot perform this operation, and therefore
+  **the Cloudflare-oriented Cache Warmer will not function correctly** on a default n8n Docker setup.
+
+**Notes for users:**
+
+* This setting is necessary only for the Cache Warmer with Cloudflare Workers use case.
+  Typical n8n workflows may not require `crypto`.
+* Users should evaluate this configuration according to their own security model and usage scenario.
 
 ## Quick Start
 
@@ -198,3 +237,4 @@ sudo apt-get update && sudo apt-get install -y ca-certificates curl gnupg
 curl -fsSL https://get.docker.com | sudo sh
 sudo usermod -aG docker $USER
 ```
+#
