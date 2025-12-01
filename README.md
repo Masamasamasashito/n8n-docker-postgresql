@@ -39,8 +39,9 @@ By standardizing on this stack, we make it simple to install, secure, and share 
 
 ### 1. Updated Docker image tags to `latest` / `*-alpine`
 
-This fork switches all service image tags to `latest` or `*-alpine`.
-The intention is to reduce the likelihood of running outdated images by pulling newer upstream updates (including security patches) when the containers are recreated.
+This was changed in the docker-compose.yml file.  
+This fork switches all service image tags to `latest` or `*-alpine`.  
+The intention is to reduce the likelihood of running outdated images by pulling newer upstream updates (including security patches) when the containers are recreated.  
 
 **Important considerations:**
 
@@ -53,6 +54,7 @@ This behavior is documented to help operators choose the appropriate versioning 
 
 ### 2. Added `NODE_FUNCTION_ALLOW_BUILTIN: crypto` (required for n8n Cache Warmer)
 
+This was added in the docker-compose.yml file.  
 This fork enables the Node.js built-in module `crypto` inside n8n Function nodes by adding:
 
 ```
