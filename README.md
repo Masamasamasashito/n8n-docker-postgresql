@@ -166,9 +166,24 @@ bash backup.sh --output ./backups --include-caddy --label manual
 Set url for searxing as  http://searxng:8080
 
 ## Adding a Worker (Optional, Advanced)
-For heavy loads, you can extend `docker-compose.yml` with an `n8n-worker` service.
+For heavy loads, you can extend your setup with an `n8n-worker` service.
 
-### Example snippet:
+### Understanding the Architecture Change
+By default, the main `n8n` container handles everything: receiving webhooks, serving the UI, and **executing workflows**.
+When you enable workers, the responsibility acts as follows:
+*   **Main n8n**: Receives webhooks & serves UI. Instead of executing workflows, it pushes jobs to **Redis**.
+*   **Redis**: Acts as a job queue.
+*   **n8n-worker**: Pulls jobs from Redis and executes them.
+
+This allows you to handle more concurrent workflows by simply adding more worker containers.
+
+### Step 1: specific setting for main n8n service
+To use workers, you **must disconnect the main n8n instance from direct execution**.
+Add `EXECUTIONS_MODE: queue` to the `environment:` section of your **main** `n8n` service in `docker-compose.yml`.
+
+### Step 2: Add Worker Service Definition
+Add the following service definition to your `docker-compose.yml`:
+
 ```yaml
 n8n-worker:
   container_name: n8n_worker
@@ -191,7 +206,6 @@ n8n-worker:
 
     # Encryption & Mode
     N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
-    # IMPORTANT: You must also set EXECUTIONS_MODE=queue on the main n8n service
     EXECUTIONS_MODE: queue
 
     # Timezone
@@ -212,13 +226,20 @@ n8n-worker:
   restart: unless-stopped
 ```
 
-Run workers alongside your main `n8n`:
+### Step 3: Run
 ```bash
-docker compose up -d n8n-worker
+docker compose up -d
+# scale up workers if needed
 docker compose up -d --scale n8n-worker=3
 ```
 
-### Using SearXNG in N8N ###
+### Disable Worker (Revert to default)
+To go back to the single-container mode:
+1. Stop the workers: `docker compose stop n8n-worker`
+2. Remove `EXECUTIONS_MODE: queue` from your main `n8n` service.
+3. Restart: `docker compose up -d`
+
+### Using SearXNG in N8N
 Add SearXNG as a tool to your AI Agent
 Credentials add http://searxng:8080
 
