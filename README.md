@@ -96,7 +96,7 @@ open http://localhost:5678
 git clone https://github.com/Masamasamasashito/n8n-docker-postgresql.git
 cp env.example .env
 # in .env set:
-# N8N_HOSTNAME=your.domain
+# N8N_PUBLIC_HOSTNAME=your.domain
 # ACME_EMAIL=you@example.com
 # PRODUCTION=true
 docker compose --profile prod up -d
