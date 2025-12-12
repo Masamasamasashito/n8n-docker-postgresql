@@ -1,6 +1,10 @@
 services:
 
+#---------------------------------------------------------------------------
+# n8n service
+#---------------------------------------------------------------------------
   n8n:
+    container_name: n8n_container
     image: n8nio/n8n:latest
     # Local default: expose 5678 
     ports:
@@ -25,11 +29,12 @@ services:
       N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
 
       # Host & URLs (single var pattern)
-      N8N_HOST: ${N8N_HOSTNAME:-localhost}
+      N8N_HOST: ${HOSTNAME_N8N_CONTAINER:-localhost}
       N8N_PORT: ${N8N_CONTAINER_LISTEN_PORT:-5678}
       # Protocol remains http; external URLs come from WEBHOOK_URL
       N8N_PROTOCOL: ${N8N_PROTOCOL:-http}
-      WEBHOOK_URL: ${N8N_HOSTNAME:+https://}${N8N_HOSTNAME:-http://localhost:${DOCKER_HOST_PORT_N8N_CONTAINER:-5678}}/
+      # If do not exist HOSTNAME , use DOCKER_HOST_PORT
+      WEBHOOK_URL: ${N8N_PUBLIC_HOSTNAME:+https://}${N8N_PUBLIC_HOSTNAME:-http://localhost:${DOCKER_HOST_PORT_N8N_CONTAINER:-5678}}/
       # Enable community nodes as tools
       N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE: true
       # Timezone
@@ -37,7 +42,7 @@ services:
 
       # Redis (queue)
       QUEUE_BULL_REDIS_HOST: redis
-      QUEUE_BULL_REDIS_PORT: 6379
+      QUEUE_BULL_REDIS_PORT: ${REDIS_CONTAINER_LISTEN_PORT:-6379}
       QUEUE_BULL_REDIS_DB: ${REDIS_DB:-0}
       QUEUE_BULL_REDIS_PASSWORD: ${REDIS_PASSWORD:-}
 
@@ -56,7 +61,11 @@ services:
     networks: [app]
     restart: unless-stopped
 
+#---------------------------------------------------------------------------
+# postgres service
+#---------------------------------------------------------------------------
   postgres:
+    container_name: postgres_container
     image: postgres:alpine
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-n8n}
@@ -72,7 +81,11 @@ services:
     networks: [app]
     restart: unless-stopped
 
+#---------------------------------------------------------------------------
+# redis service
+#---------------------------------------------------------------------------
   redis:
+    container_name: redis_container
     image: redis:alpine
     command: ["redis-server", "--appendonly", "yes"]
     # For production, set REDIS_PASSWORD in .env and use:
@@ -87,17 +100,20 @@ services:
     networks: [app]
     restart: unless-stopped
 
+#---------------------------------------------------------------------------
+# searxng service
+#---------------------------------------------------------------------------
   searxng:
-    container_name: searxng
+    container_name: searxng_container
     image: docker.io/searxng/searxng:latest
     restart: unless-stopped
     # Expose to the internal network; Caddy will proxy it in prod.
     expose:
-      - "8080"
+      - "${SEARXNG_CONTAINER_LISTEN_PORT:-8080}"
     # Optional: for local/dev access without Caddy, map the port behind a profile
     ports:
-      - target: 8080
-        published: 8080
+      - target: ${SEARXNG_CONTAINER_LISTEN_PORT:-8080}
+        published: ${DOCKER_HOST_PORT_SEARXNG_CONTAINER:-8080}
         protocol: tcp
         mode: host
     volumes:
@@ -107,6 +123,7 @@ services:
       - UWSGI_WORKERS=${SEARXNG_UWSGI_WORKERS:-4}
       - UWSGI_THREADS=${SEARXNG_UWSGI_THREADS:-4}
       - SEARXNG_SECRET=${SEARXNG_SECRET}
+      SEARXNG_PORT: ${SEARXNG_CONTAINER_LISTEN_PORT:-8080} 
     cap_drop:
       - ALL
     cap_add:
@@ -123,13 +140,17 @@ services:
         condition: service_healthy
     networks: [app]
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/healthz"]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:${SEARXNG_CONTAINER_LISTEN_PORT:-8080}/healthz"]
       interval: 10s
       timeout: 5s
       retries: 5
 
+#---------------------------------------------------------------------------
+# caddy service
+#---------------------------------------------------------------------------
   # Only runs in production
   caddy:
+    container_name: caddy_container
     image: caddy:alpine
     depends_on:
       - n8n
@@ -138,7 +159,7 @@ services:
       - "443:443"
     environment:
       ACME_EMAIL: ${ACME_EMAIL}
-      N8N_HOSTNAME: ${N8N_HOSTNAME}
+      N8N_HOSTNAME: ${N8N_PUBLIC_HOSTNAME}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
