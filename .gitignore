@@ -4,3 +4,7 @@ postgres_data
 redis_data
 n8n_nodes
 searxng/settings.yml.new
+playwright/node_modules/
+playwright/npm-debug.log
+npm-debug.log
+.DS_Store

@@ -1,8 +1,8 @@
 services:
 
-#---------------------------------------------------------------------------
-# n8n service
-#---------------------------------------------------------------------------
+  #---------------------------------------------------------------------------
+  # n8n service
+  #---------------------------------------------------------------------------
   n8n:
     container_name: n8n_container
     image: n8nio/n8n:latest
@@ -50,6 +50,8 @@ services:
       N8N_SECURE_COOKIE: ${PRODUCTION:-false}
       N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: ${PRODUCTION:-false}
     depends_on:
+      playwright:
+        condition: service_healthy
       postgres:
         condition: service_healthy
       redis:
@@ -58,12 +60,34 @@ services:
       - ./n8n_data:/home/node/.n8n
       # git for nodes. First Create ./n8n_nodes on Host
       - ./n8n_nodes:/home/node/.n8n/nodes
-    networks: [app]
+    networks: [ app ]
     restart: unless-stopped
 
-#---------------------------------------------------------------------------
-# postgres service
-#---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # Playwright API Service (ECW Sidecar)
+  # ---------------------------------------------------------------------------
+  playwright:
+    build:
+      context: ./playwright # ★ サービスビルドディレクトリ
+    container_name: playwright_container
+    ports:
+      - "${DOCKER_HOST_PORT_PLAYWRIGHT:-3000}:${PLAYWRIGHT_CONTAINER_LISTEN_PORT:-3000}"
+    environment:
+      - PLAYWRIGHT_TARGET_VERSION=${PLAYWRIGHT_TARGET_VERSION:-latest}
+      - PLAYWRIGHT_CONTAINER_LISTEN_PORT=${PLAYWRIGHT_CONTAINER_LISTEN_PORT:-3000}
+    volumes:
+      - playwright_data:/app/data
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://127.0.0.1:${PLAYWRIGHT_CONTAINER_LISTEN_PORT:-3000}/healthz" ]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+    networks: [ app ]
+    restart: unless-stopped
+
+  #---------------------------------------------------------------------------
+  # postgres service
+  #---------------------------------------------------------------------------
   postgres:
     container_name: postgres_container
     image: postgres:alpine
@@ -74,35 +98,35 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-n8n} -d ${POSTGRES_DB:-n8n}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-n8n} -d ${POSTGRES_DB:-n8n}" ]
       interval: 10s
       timeout: 5s
       retries: 5
-    networks: [app]
+    networks: [ app ]
     restart: unless-stopped
 
-#---------------------------------------------------------------------------
-# redis service
-#---------------------------------------------------------------------------
+  #---------------------------------------------------------------------------
+  # redis service
+  #---------------------------------------------------------------------------
   redis:
     container_name: redis_container
     image: redis:alpine
-    command: ["redis-server", "--appendonly", "yes"]
+    command: [ "redis-server", "--appendonly", "yes" ]
     # For production, set REDIS_PASSWORD in .env and use:
     # command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD}"]
     volumes:
       - ./redis_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 5
-    networks: [app]
+    networks: [ app ]
     restart: unless-stopped
 
-#---------------------------------------------------------------------------
-# searxng service
-#---------------------------------------------------------------------------
+  #---------------------------------------------------------------------------
+  # searxng service
+  #---------------------------------------------------------------------------
   searxng:
     container_name: searxng_container
     image: docker.io/searxng/searxng:latest
@@ -117,13 +141,13 @@ services:
         protocol: tcp
         mode: host
     volumes:
-      - ./searxng:/etc/searxng:rw
+      - ./searxng_data:/etc/searxng:rw
     environment:
       - SEARXNG_BASE_URL=https://${SEARXNG_HOSTNAME:-localhost}/
       - UWSGI_WORKERS=${SEARXNG_UWSGI_WORKERS:-4}
       - UWSGI_THREADS=${SEARXNG_UWSGI_THREADS:-4}
       - SEARXNG_SECRET=${SEARXNG_SECRET}
-      - SEARXNG_PORT=${SEARXNG_CONTAINER_LISTEN_PORT:-8080} 
+      - SEARXNG_PORT=${SEARXNG_CONTAINER_LISTEN_PORT:-8080}
     cap_drop:
       - ALL
     cap_add:
@@ -138,16 +162,16 @@ services:
     depends_on:
       redis:
         condition: service_healthy
-    networks: [app]
+    networks: [ app ]
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:${SEARXNG_CONTAINER_LISTEN_PORT:-8080}/healthz"]
+      test: [ "CMD", "wget", "-qO-", "http://127.0.0.1:${SEARXNG_CONTAINER_LISTEN_PORT:-8080}/healthz" ]
       interval: 10s
       timeout: 5s
       retries: 5
 
-#---------------------------------------------------------------------------
-# caddy service
-#---------------------------------------------------------------------------
+  #---------------------------------------------------------------------------
+  # caddy service
+  #---------------------------------------------------------------------------
   # Only runs in production
   caddy:
     container_name: caddy_container
@@ -164,14 +188,24 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
-    networks: [app]
+    networks: [ app ]
     restart: unless-stopped
-    profiles: ["prod"]
+    profiles: [ "prod" ]
 
 networks:
   app:
 
+
 volumes:
+  playwright_data:
+    name: "${PLAYWRIGHT_VOLUME_NAME:-ecwPlaywrightDataVolume}"
   postgres_data:
+    name: "${POSTGRES_VOLUME_NAME:-ecwPostgresDataVolume}"
+  redis_data:
+    name: "${REDIS_VOLUME_NAME:-ecwRedisDataVolume}"
+  searxng_data:
+    name: "${SEARXNG_VOLUME_NAME:-ecwSearxngDataVolume}"
   caddy_data:
+    name: "${CADDY_VOLUME_NAME:-ecwCaddyDataVolume}"
   caddy_config:
+    name: "${CADDY_CONFIG_VOLUME_NAME:-ecwCaddyConfigVolume}"
