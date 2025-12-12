@@ -52,31 +52,6 @@ The intention is to reduce the likelihood of running outdated images by pulling 
 
 This behavior is documented to help operators choose the appropriate versioning policy based on their environment’s security and stability requirements.
 
-### 2. Added `NODE_FUNCTION_ALLOW_BUILTIN: crypto` (required for n8n Cache Warmer)
-
-This was added in the docker-compose.yml file.  
-This fork enables the Node.js built-in module `crypto` inside n8n Function nodes by adding:
-
-```
-NODE_FUNCTION_ALLOW_BUILTIN: crypto
-```
-
-**Why this is required:**
-
-* The current n8n-based Cache Warmer integration (designed for use with a Cloudflare Workers proxy) generates a signed authentication token.
-* This token is created using:
-
-  * **SHA-256 hashing**
-  * **Hex-encoded output**
-* Without enabling `crypto`, n8n’s Function nodes cannot perform this operation, and therefore
-  **the Cloudflare-oriented Cache Warmer will not function correctly** on a default n8n Docker setup.
-
-**Notes for users:**
-
-* This setting is necessary only for the Cache Warmer with Cloudflare Workers use case.
-  Typical n8n workflows may not require `crypto`.
-* Users should evaluate this configuration according to their own security model and usage scenario.
-
 ## Quick Start
 
 ### Local (default)
