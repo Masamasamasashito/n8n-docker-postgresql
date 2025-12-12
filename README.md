@@ -167,6 +167,9 @@ This runs:
 bash backup.sh --output ./backups --include-caddy --label manual
 ```
 
+## Usage
+
+> 💡 **Two-Stage Startup Guide**: For reliable control over Playwright builds, see [README_STARTUP.md](README_STARTUP.md).
 ## Use searxing in an N8N
 Set url for searxing as  http://searxng:8080
 

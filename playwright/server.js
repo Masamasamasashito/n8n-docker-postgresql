@@ -6,6 +6,11 @@ app.use(express.json());
 const PlaywrightNpmVer = require('playwright/package.json').version;
 console.log(`[ECW-INFO] Playwright Service Started. PlaywrightNpmVersion: ${PlaywrightNpmVer}`);
 
+// Health check endpoint for Docker
+app.get('/healthz', (req, res) => {
+    res.status(200).json({ status: 'ok', version: PlaywrightNpmVer });
+});
+
 app.post('/content', async (req, res) => {
     const { url } = req.body;
     if (!url) return res.status(400).send('URL is required');
