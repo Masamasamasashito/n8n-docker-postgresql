@@ -171,22 +171,38 @@ For heavy loads, you can extend `docker-compose.yml` with an `n8n-worker` servic
 ### Example snippet:
 ```yaml
 n8n-worker:
+  container_name: n8n_worker
   image: n8nio/n8n:latest
-  command: ["n8n", "worker"]
+  command: worker
   environment:
-    EXECUTIONS_MODE: queue
+    # Database
     DB_TYPE: postgresdb
     DB_POSTGRESDB_HOST: postgres
     DB_POSTGRESDB_PORT: 5432
     DB_POSTGRESDB_DATABASE: ${POSTGRES_DB}
     DB_POSTGRESDB_USER: ${POSTGRES_USER}
     DB_POSTGRESDB_PASSWORD: ${POSTGRES_PASSWORD}
+
+    # Redis (queue)
     QUEUE_BULL_REDIS_HOST: redis
-    QUEUE_BULL_REDIS_PORT: 6379
+    QUEUE_BULL_REDIS_PORT: ${REDIS_CONTAINER_LISTEN_PORT:-6379}
     QUEUE_BULL_REDIS_DB: ${REDIS_DB:-0}
     QUEUE_BULL_REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+
+    # Encryption & Mode
     N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
-    GENERIC_TIMEZONE: ${GENERIC_TIMEZONE:-America/Detroit}
+    # IMPORTANT: You must also set EXECUTIONS_MODE=queue on the main n8n service
+    EXECUTIONS_MODE: queue
+
+    # Timezone
+    GENERIC_TIMEZONE: ${GENERIC_TIMEZONE:-Asia/Tokyo}
+    
+    # Community Nodes (if shared)
+    N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE: true
+
+  volumes:
+    # Share installed nodes
+    - ./n8n_nodes:/home/node/.n8n/nodes
   depends_on:
     postgres:
       condition: service_healthy
