@@ -4,7 +4,7 @@ services:
     image: n8nio/n8n:latest
     # Local default: expose 5678 
     ports:
-      - "5678:5678"
+      - "${HOST_PORT_N8N_CONTAINER:-5678}:${N8N_CONTAINER_LISTEN_PORT:-5678}"
     environment:
       # Database
       DB_TYPE: postgresdb
@@ -26,10 +26,10 @@ services:
 
       # Host & URLs (single var pattern)
       N8N_HOST: ${N8N_HOSTNAME:-localhost}
-      N8N_PORT: 5678
+      N8N_PORT: ${N8N_CONTAINER_LISTEN_PORT:-5678}
       # Protocol remains http; external URLs come from WEBHOOK_URL
       N8N_PROTOCOL: ${N8N_PROTOCOL:-http}
-      WEBHOOK_URL: ${N8N_HOSTNAME:+https://}${N8N_HOSTNAME:-http://localhost:5678}/
+      WEBHOOK_URL: ${N8N_HOSTNAME:+https://}${N8N_HOSTNAME:-http://localhost:${HOST_PORT_N8N_CONTAINER:-5678}}/
       # Enable community nodes as tools
       N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE: true
       # Timezone
