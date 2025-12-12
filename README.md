@@ -97,6 +97,11 @@ $hex = -join ($bytes | ForEach-Object { $_.ToString("x2") })
 Add-Content -Path .env -Value ("N8N_ENCRYPTION_KEY=$hex")
 ```
 
+### About WARMER_SECRET
+The `WARMER_SECRET` in `.env.example` is used for the **Multi Cloud Edge Cache Warmer** (developed by Nishi Lab).
+It serves as an authentication key to verify requests using a shared secret logic (similar to HMAC SHA-256 signature verification).
+If you are not using this specific cache warmer integration, you can ignore or leave this value as is.
+
 
 ## Viewing Logs
 
