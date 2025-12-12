@@ -243,6 +243,10 @@ To go back to the single-container mode:
 Add SearXNG as a tool to your AI Agent
 Credentials add http://searxng:8080
 
+### Note on searxng/settings.yml.new
+The `searxng` container may generate a `settings.yml.new` file. This contains the default complete configuration reference.
+We have added this file to `.gitignore` to keep the repository clean, so you can safely ignore it.
+
 ### Ubuntu Commands:
 ```bash
 # Common prereqs (Ubuntu 24.04)
